@@ -1,37 +1,26 @@
 package main
 
 import (
-	"io"
-	"net/http"
-	"os"
+	"flag"
+	"fmt"
+
+	"github.com/Tony-Moon/goloader/portal"
+	"github.com/Tony-Moon/goloader/reciever"
+	"github.com/Tony-Moon/goloader/sender"
 )
 
-var fileURL string
-
 func main() {
-	fileURL = "https://golangcode.com/images/avatar.jpg"
-	if err := DownloadFile("avatar.jpg", fileURL); err != nil {
-		panic(err)
-	}
-}
+	runMode := flag.String("m", "none", "-m or runMode, tells the program to run in sender, portal or reciever mode.")
+	flag.Parse()
 
-// DownloadFile will download a url to a locoal file.
-func DownloadFile(filepath string, url string) error {
-	// Get the data
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
+	if *runMode == "s" {
+		sender.GoSend()
+	} else if *runMode == "p" {
+		portal.GoPortal()
+	} else if *runMode == "r" {
+		reciever.GoRecieve()
+	} else {
+		fmt.Println("Unrecognized command.")
 	}
-	defer resp.Body.Close()
 
-	// Create a file
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	// Write to the file
-	_, err = io.Copy(out, resp.Body)
-	return err
 }
